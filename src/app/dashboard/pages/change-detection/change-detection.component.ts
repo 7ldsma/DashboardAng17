@@ -1,11 +1,61 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { TitleComponent } from '@shared/title/title.component';
+import { timeout } from 'rxjs';
 
 @Component({
   standalone: true,
-  imports: [],
-  templateUrl: './change-detection.component.html',
+  imports: [CommonModule, TitleComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+
+    <app-title [title]="currentFramework()" />
+    <pre>{{ frameworkasSignal() | json }}</pre>
+    <pre>{{ frameworkasProperty | json }}</pre>
+
+
+  `,
   styles: ``
 })
+
+
+
 export default class ChangeDetectionComponent {
+
+
+  public currentFramework = computed(
+    () => `Change Detection - ${ this.frameworkasSignal().name }`
+  )
+
+  public frameworkasSignal = signal({
+    name: 'Angular',
+    releaseDate: '2016',
+  })
+
+  public frameworkasProperty = {
+    name: 'Angular',
+    releaseDate: '2016',
+  }
+
+
+  constructor() {
+
+    setTimeout(() => {
+
+      // this.frameworkasProperty.name = 'React';
+      this.frameworkasSignal.update( value => ({
+        ...value,
+        name: 'React'
+      }))
+
+      console.log('Hecho');
+      
+    }, 3000);
+
+
+
+  }
+
+
 
 }
